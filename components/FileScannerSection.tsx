@@ -9,7 +9,7 @@ import {
 } from "@/lib/fileAnalysis";
 import { saveToHistory } from "@/lib/history";
 
-const MAX_BYTES = 25 * 1024 * 1024; // 25 MB
+const MAX_BYTES = 1024 * 1024 * 1024; // 1 GB
 
 export default function FileScannerSection({ id = "file" }: { id?: string }) {
   const [result, setResult] = useState<FileReport | null>(null);
@@ -21,7 +21,7 @@ export default function FileScannerSection({ id = "file" }: { id?: string }) {
   async function scan(file: File | undefined | null) {
     if (!file) return;
     if (file.size > MAX_BYTES) {
-      setError("File too large (max 25 MB).");
+      setError("File too large (max 1 GB).");
       return;
     }
     setLoading(true);
@@ -83,7 +83,7 @@ export default function FileScannerSection({ id = "file" }: { id?: string }) {
       >
         {loading ? "🔬 Analyzing file…" : "📁 Drop a file here or click to choose"}
         <div style={{ fontSize: 12.5, marginTop: 6 }}>
-          100% local — hashed (SHA-256) and inspected in your browser, never uploaded. Max 25 MB.
+          100% local — hashed (SHA-256) and inspected in your browser, never uploaded. Max 1 GB.
         </div>
       </div>
       <input
