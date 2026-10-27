@@ -1,0 +1,117 @@
+name: ClamAV Static File Scan
+
+# Scans files with the real ClamAV engine. Files are NEVER executed — only read
+# and matched against virus signatures. Safe to run on any uploaded payload.
+#
+# Triggers:
+#  - push to the quarantine/ folder (or changes to this workflow)
+#  - manual / API dispatch (used by the site via GITHUB_PAT)
+#  - daily scheduled sweep
+#
+# NOTE: GitHub caps a single job at 6 hours. We deliberately keep this scan
+# bounded (see `timeout-minutes`) instead of looping for hours — long-running
+# loops to bypass the cap violate GitHub's Acceptable Use Policy.
+
+on:
+  push:
+    paths:
+      - 'quarantine/**'
+      - '.github/workflows/clamav-scan.yml'
+  workflow_dispatch:
+    inputs:
+      file_url:
+        description: 'Optional http(s) URL of a file to download and scan (never executed)'
+        required: false
+        default: ''
+      reason:
+        description: 'Why this scan was triggered (ticket / reference)'
+        required: false
+        default: 'manual'
+  schedule:
+    - cron: '0 3 * * *' # daily at 03:00 UTC
+
+permissions:
+  contents: read
+
+concurrency:
+  group: clamav-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install ClamAV
+        timeout-minutes: 15
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clamav
+
+      - name: Update virus definitions
+        timeout-minutes: 15
+        run: |
+          # Stop the packaged daemon so freshclam is not blocked by a lock file.
+          sudo systemctl stop clamav-freshclam 2>/dev/null || true
+          sudo freshclam || echo "::warning::freshclam failed — falling back to bundled signatures"
+
+      - name: Fetch remote file (optional)
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.file_url != '' }}
+        run: |
+          mkdir -p quarantine/incoming
+          curl -fsSL --max-time 600 --max-filesize 1073741824 \
+            -o "quarantine/incoming/downloaded.bin" \
+            "${{ github.event.inputs.file_url }}"
+          ls -lh quarantine/incoming
+
+      - name: Scan with ClamAV (static only)
+        id: scan
+        run: |
+          set +e
+          clamscan --infected --recursive --log=clamav-report.log quarantine/
+          code=$?
+          set -e
+          infected=$(grep -c "FOUND" clamav-report.log 2>/dev/null || true)
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          echo "infected=$infected" >> "$GITHUB_OUTPUT"
+          echo "--- Scan summary ---"
+          grep -E "Scanned files|Infected files" clamav-report.log 2>/dev/null || true
+          # Do not fail here; the dedicated step below decides the job result.
+          exit 0
+
+      - name: Write job summary
+        if: always()
+        run: |
+          {
+            echo "## 🦠 ClamAV static scan"
+            echo ""
+            echo "| Field | Value |"
+            echo "| --- | --- |"
+            echo "| Trigger | \`${{ github.event_name }}\` |"
+            echo "| Infected files | **${{ steps.scan.outputs.infected }}** |"
+            echo "| Exit code | \`${{ steps.scan.outputs.exit_code }}\` |"
+            echo ""
+            echo '```'
+            tail -n 40 clamav-report.log 2>/dev/null || echo "no report produced"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload scan report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clamav-report
+          path: clamav-report.log
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Fail on detection or scan error
+        if: steps.scan.outputs.exit_code != '0'
+        run: |
+          echo "::error::ClamAV reported malware or a scan error (exit ${{ steps.scan.outputs.exit_code }}). See the clamav-report artifact."
+          exit 1
