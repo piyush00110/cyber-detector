@@ -8,9 +8,10 @@ export default function Footer() {
           <b style={{ color: "#fff" }}>🛡️ Cyber Detector</b>
           <div style={{ marginTop: 6, maxWidth: 400 }}>
             Free URL, file/virus and malicious-code checker. Google Safe
-            Browsing + weighted heuristic engines + in-browser file analysis.
-            History stays in your localStorage. For education and triage — not
-            a replacement for enterprise AV or sandboxed malware analysis.
+            Browsing + weighted heuristics + a real ClamAV scan through a
+            private queue. History stays in your localStorage. For education and
+            triage — not a replacement for enterprise AV or sandboxed malware
+            analysis.
           </div>
         </div>
         <nav>

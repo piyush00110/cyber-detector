@@ -38,8 +38,9 @@ export default function FileResultCard({ result }: { result: FileReport }) {
         <div className="meta">No malicious file traits matched.</div>
       )}
       <div className="meta">
-        Scanned {new Date(result.scannedAt).toLocaleString()} · analyzed locally in your browser,
-        never uploaded.
+        Scanned {new Date(result.scannedAt).toLocaleString()} · local heuristics
+        (SHA-256, entropy, signatures) plus a ClamAV queue scan. Files are never
+        executed.
       </div>
     </div>
   );

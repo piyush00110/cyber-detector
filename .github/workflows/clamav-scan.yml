@@ -1,16 +1,15 @@
 name: ClamAV Static File Scan
 
 # Scans files with the real ClamAV engine. Files are NEVER executed — only read
-# and matched against virus signatures. Safe to run on any uploaded payload.
+# and matched against virus signatures.
 #
-# Triggers:
-#  - push to the quarantine/ folder (or changes to this workflow)
-#  - manual / API dispatch (used by the site via GITHUB_PAT)
-#  - daily scheduled sweep
+# This workflow is used twice:
+#  1. In this repo, for manual/test scans of quarantine/.
+#  2. In the PRIVATE quarantine repo (npm run setup:quarantine), where the web
+#     app commits uploads to quarantine/incoming/. After scanning, the verdict is
+#     written to scan-results/<sha256>.json and the payload is deleted.
 #
-# NOTE: GitHub caps a single job at 6 hours. We deliberately keep this scan
-# bounded (see `timeout-minutes`) instead of looping for hours — long-running
-# loops to bypass the cap violate GitHub's Acceptable Use Policy.
+# GitHub caps a single job at 6 hours; we keep this bounded on purpose.
 
 on:
   push:
@@ -31,7 +30,7 @@ on:
     - cron: '0 3 * * *' # daily at 03:00 UTC
 
 permissions:
-  contents: read
+  contents: write # needed to publish results and delete scanned payloads
 
 concurrency:
   group: clamav-scan
@@ -56,17 +55,19 @@ jobs:
       - name: Update virus definitions
         timeout-minutes: 15
         run: |
-          # Stop the packaged daemon so freshclam is not blocked by a lock file.
           sudo systemctl stop clamav-freshclam 2>/dev/null || true
           sudo freshclam || echo "::warning::freshclam failed — falling back to bundled signatures"
 
       - name: Fetch remote file (optional)
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.file_url != '' }}
         run: |
-          mkdir -p quarantine/incoming
+          mkdir -p /tmp/clamav-in
           curl -fsSL --max-time 600 --max-filesize 1073741824 \
-            -o "quarantine/incoming/downloaded.bin" \
+            -o /tmp/clamav-in/downloaded.bin \
             "${{ github.event.inputs.file_url }}"
+          sha=$(sha256sum /tmp/clamav-in/downloaded.bin | cut -d' ' -f1)
+          mkdir -p quarantine/incoming
+          mv /tmp/clamav-in/downloaded.bin "quarantine/incoming/${sha}-downloaded.bin"
           ls -lh quarantine/incoming
 
       - name: Scan with ClamAV (static only)
@@ -81,8 +82,58 @@ jobs:
           echo "infected=$infected" >> "$GITHUB_OUTPUT"
           echo "--- Scan summary ---"
           grep -E "Scanned files|Infected files" clamav-report.log 2>/dev/null || true
-          # Do not fail here; the dedicated step below decides the job result.
           exit 0
+
+      - name: Publish results and delete scanned payloads
+        if: always()
+        run: |
+          [ -f clamav-report.log ] || exit 0
+          shopt -s nullglob
+          for f in quarantine/incoming/*; do
+            [ -f "$f" ] || continue
+            base=$(basename "$f")
+            sha="${base%%-*}"
+            if ! printf '%s' "$sha" | grep -Eq '^[a-f0-9]{64}$'; then
+              sha=$(sha256sum "$f" | cut -d' ' -f1)
+            fi
+
+            sigs_json=""
+            if grep -q "$sha" clamav-report.log; then
+              while IFS= read -r sig; do
+                [ -n "$sig" ] && sigs_json="${sigs_json}\"${sig}\","
+              done < <(grep "$sha" clamav-report.log | sed -E 's/^.*: (.*) FOUND$/\1/')
+              infected=true
+              verdict=malicious
+            else
+              infected=false
+              verdict=clean
+            fi
+            sigs_json="[${sigs_json%,}]"
+
+            mkdir -p scan-results
+            cat > "scan-results/${sha}.json" <<JSON
+          {
+            "sha256": "${sha}",
+            "filename": "${base}",
+            "infected": ${infected},
+            "verdict": "${verdict}",
+            "signatures": ${sigs_json},
+            "scannedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "engine": "ClamAV"
+          }
+          JSON
+            rm -f "$f"
+          done
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A scan-results quarantine
+          if ! git diff --cached --quiet; then
+            git commit -m "ClamAV results ${GITHUB_SHA}"
+            git push
+          else
+            echo "No results to publish."
+          fi
 
       - name: Write job summary
         if: always()

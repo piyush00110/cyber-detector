@@ -76,7 +76,8 @@ export default function LearnPage() {
         <div className="note">
           Golden rules: for banks/crypto — never click in, open the official
           app. For files — never double-click to “test”; drop them in the{" "}
-          <Link href="/analyze">file scanner</Link> first (it never uploads).
+          <Link href="/analyze">file scanner</Link> first (it uploads to a private
+          queue and never executes the file).
         </div>
         <p>
           <Link href="/scan">→ Scan a suspicious link</Link> ·{" "}

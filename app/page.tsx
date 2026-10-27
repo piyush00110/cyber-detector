@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 const FEATURES = [
   { icon: "🔍", title: "Google Safe Browsing", body: "URLs checked against Google's blocklists: malware, phishing (social engineering), unwanted software and harmful apps." },
   { icon: "🧠", title: "Best-weight URL algorithm", body: "Weighted-signal engine: no-HTTPS, IP hosts, @ tricks, punycode lookalikes, risky TLDs, shorteners, lure keywords, deep paths — one 0–100 risk score." },
-  { icon: "🦠", title: "In-browser virus/file check", body: "Files are SHA-256 hashed and inspected on your device — EICAR signatures, double extensions, spoofed magic bytes, entropy packing, embedded scripts. Never uploaded." },
+  { icon: "🦠", title: "ClamAV virus/file check", body: "Fast local heuristics (SHA-256, magic bytes, entropy, EICAR) plus a real ClamAV scan on GitHub Actions. Files are uploaded to a private queue and never executed." },
   { icon: "🧬", title: "Malicious-code analyzer", body: "Static scan of JS, HTML, Python, PowerShell, shell and macros: eval, obfuscation, stealers, reverse shells, miners — 18 patterns, never executed." },
   { icon: "💾", title: "localStorage history", body: "Every scan is saved on your device only — URLs store verdict+score, files store hash, code stores filename. Clear anytime, nothing leaves your browser." },
   { icon: "🔌", title: "Free JSON API", body: "POST /api/scan-url, /api/scan-bulk and /api/analyze-code. Documented under API Docs." },
@@ -30,8 +30,8 @@ const FILE_THREATS = [
 ];
 
 const FAQS = [
-  { q: "Is it free? Do I need an API key?", a: "Yes, free with no signup. URL scans work in heuristic-only mode without a key; add GOOGLE_SAFE_BROWSING_API_KEY in .env.local for full blocklist verdicts (free quota from Google Cloud). File and code scans always work — they run 100% locally." },
-  { q: "Are my files uploaded anywhere?", a: "No. File scanning is fully in-browser: SHA-256 hash + byte inspection happen on your device. Only the hash and verdict are kept in your localStorage — never the file content." },
+  { q: "Is it free? Do I need an API key?", a: "Yes, free with no signup. URL scans work in heuristic-only mode without a key; add GOOGLE_SAFE_BROWSING_API_KEY in .env.local for full blocklist verdicts (free quota from Google Cloud). Code scans run locally. File scans add a real ClamAV pass through a private GitHub Actions queue." },
+  { q: "Are my files uploaded anywhere?", a: "Yes, for virus scanning. Your browser first runs fast local heuristics (SHA-256, magic bytes, entropy, EICAR). Files up to 45 MB are then uploaded to a private scan queue and checked by the ClamAV engine on GitHub Actions; the payload is deleted after scanning. Files are never executed." },
   { q: "What is stored in localStorage?", a: "URL scans keep url+verdict+score, file scans keep filename+hash+verdict, code scans keep filename+verdict. Max 30 entries, on your device only. One click clears everything." },
   { q: "What do the verdicts mean?", a: "CLEAN/SAFE: nothing found. SUSPICIOUS: odd traits — verify before opening. MALICIOUS: dangerous — do not visit, open or run." },
   { q: "Can a clean result still be dangerous?", a: "Yes. Blocklists lag zero-day sites and static analysis can't catch everything. Treat unexpected links and attachments as hostile regardless of verdict — and never run suspicious files on a real machine." },
@@ -49,14 +49,14 @@ export default function HomePage() {
           </h1>
           <p className="lead">
             Scan URLs against Google Safe Browsing + phishing heuristics, check
-            files for viruses locally in your browser, and analyze suspicious
-            code — with history saved only on your device.
+            files with local heuristics and the ClamAV engine, and analyze
+            suspicious code — with history saved only on your device.
           </p>
           <ScannerTabs />
           <div className="hero-badges">
             <span>✅ No signup</span>
             <span>⚡ ~1s scans</span>
-            <span>🔒 Files never uploaded</span>
+            <span>🛡️ ClamAV virus scan</span>
             <span>💾 localStorage history</span>
           </div>
         </div>
@@ -68,7 +68,7 @@ export default function HomePage() {
             <div className="stat"><b>4</b><span>URL threat categories</span></div>
             <div className="stat"><b>14+</b><span>Phishing signals</span></div>
             <div className="stat"><b>23+</b><span>File + code patterns</span></div>
-            <div className="stat"><b>0</b><span>Uploads, accounts, cost</span></div>
+            <div className="stat"><b>0</b><span>Files executed</span></div>
           </div>
         </div>
       </section>
@@ -77,8 +77,8 @@ export default function HomePage() {
         <div className="wrap">
           <div className="section-head">
             <span className="kicker">Why Cyber Detector</span>
-            <h2>Four engines, private by design</h2>
-            <p>Blocklist intelligence plus weighted local algorithms — files never leave your device.</p>
+            <h2>Four engines, explainable verdicts</h2>
+            <p>Blocklist intelligence, local heuristics, and real ClamAV signatures — nothing is ever executed.</p>
           </div>
           <div className="grid c3">
             {FEATURES.map((f) => (
@@ -102,12 +102,12 @@ export default function HomePage() {
             <div className="feature step">
               <div className="num">1</div>
               <h3>Paste, upload or drop</h3>
-              <p>URLs are normalized and validated. Files are hashed (SHA-256) and read as bytes in your browser — code is pasted as text.</p>
+              <p>URLs are normalized and validated. Files are hashed locally, then queued for ClamAV — code is pasted as text.</p>
             </div>
             <div className="feature step">
               <div className="num">2</div>
               <h3>Weighted algorithms</h3>
-              <p>Safe Browsing <code>threatMatches:find</code> plus severity-weighted signal scoring (0–100) for URLs, files and code.</p>
+              <p>Safe Browsing <code>threatMatches:find</code>, severity-weighted local scoring (0–100), and ClamAV signature matching for files.</p>
             </div>
             <div className="feature step">
               <div className="num">3</div>

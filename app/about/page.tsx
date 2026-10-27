@@ -10,23 +10,27 @@ export default function AboutPage() {
         <span className="kicker">About</span>
         <h1>Cyber Detector</h1>
         <p>
-          A fast, private, educational threat-triage tool: URL phishing
-          detection, in-browser virus/file analysis and static malicious-code
-          scanning. Built with Next.js 14 (App Router) + TypeScript, with
-          transparent weighted algorithms so every verdict is explainable.
+          A fast, educational threat-triage tool: URL phishing
+          detection, ClamAV-backed virus/file analysis plus local heuristics,
+          and static malicious-code scanning. Built with Next.js 14 (App Router)
+          + TypeScript, with transparent weighted algorithms so every verdict is
+          explainable.
         </p>
         <h2>How the algorithms work</h2>
         <ul>
           <li><b>URLs</b> (<code>lib/heuristics.ts</code>): 14 severity-weighted signals → 0–100 score → safe/low/suspicious/high, combined with Google Safe Browsing blocklists.</li>
-          <li><b>Files</b> (<code>lib/fileAnalysis.ts</code>): SHA-256 + EICAR/content signatures + extension risk + magic-byte verification + Shannon entropy + embedded-script scan — 100% client-side.</li>
+          <li><b>Files</b> (<code>lib/fileAnalysis.ts</code> + <code>lib/githubQuarantine.ts</code>): local SHA-256, EICAR/content signatures, extension risk, magic-byte verification, Shannon entropy and embedded-script scan — then a real ClamAV pass through a private GitHub Actions quarantine queue. Files are never executed.</li>
           <li><b>Code</b> (<code>lib/codeAnalysis.ts</code>): 18 static patterns with line numbers and matched snippets — never executed.</li>
         </ul>
         <h2>Privacy</h2>
         <p>
-          Files are never uploaded. History lives only in your browser&apos;s
-          localStorage (URLs: verdict+score · files: hash+verdict · code:
-          filename+verdict, max 30). Scanned URLs are checked against Google
-          Safe Browsing (required for blocklists). Nothing is stored server-side.
+          URLs are checked against Google Safe Browsing (required for
+          blocklists). Files run local heuristics in your browser, then up to 45
+          MB are uploaded to a private quarantine repo and scanned by ClamAV on
+          GitHub Actions; the payload is deleted after the scan. Scan history
+          (URLs: verdict+score · files: hash+verdict · code: filename+verdict,
+          max 30) lives only in your browser&apos;s localStorage. Files are never
+          executed.
         </p>
         <h2>Disclaimer</h2>
         <p>

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: "%s · Cyber Detector",
   },
   description:
-    "Free URL phishing scanner, in-browser virus/file checker and malicious-code analyzer. History in localStorage. No signup.",
+    "Free URL phishing scanner, ClamAV-backed virus/file checker and malicious-code analyzer. History in localStorage. No signup.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
