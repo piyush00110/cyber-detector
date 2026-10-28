@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import ScanForm from "@/components/ScanForm";
 import ResultCard, { type ScanApiResult } from "@/components/ResultCard";
@@ -43,9 +44,19 @@ export default function ScannerSection({ id = "scanner" }: { id?: string }) {
   return (
     <div className="scanner" id={id}>
       <ScanForm onScan={handleScan} loading={loading} />
+      {loading && <div className="loading-bar" aria-hidden="true" />}
       {error && <div className="err">{error}</div>}
       {result && <ResultCard result={result} />}
-      <HistoryList items={history} onSelectUrl={handleScan} onClear={() => setHistory([])} />
+      <HistoryList
+        items={history}
+        onSelectUrl={handleScan}
+        onClear={() => setHistory([])}
+      />
+      {history.length > 0 && (
+        <div style={{ marginTop: 12, fontSize: 13 }}>
+          <Link href="/history">View full history &amp; stats →</Link>
+        </div>
+      )}
     </div>
   );
 }

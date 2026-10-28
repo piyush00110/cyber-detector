@@ -9,6 +9,7 @@ import {
 } from "@/lib/fileAnalysis";
 import { saveToHistory } from "@/lib/history";
 import { MAX_QUEUE_BYTES, type AvResult, type AvState } from "@/lib/av";
+import { toast } from "@/lib/toast";
 
 const MAX_BYTES = 1024 * 1024 * 1024; // 1 GB (local heuristics)
 
@@ -80,10 +81,13 @@ export default function FileScannerSection({ id = "file" }: { id?: string }) {
       const res = await fetch("/api/scan-file", { method: "POST", body: fd });
       const data = await res.json().catch(() => null);
       if (!res.ok) {
-        setAv({
-          status: "error",
-          error: data?.error ?? `Could not queue the file (${res.status}).`,
-        });
+        // 413 usually means a serverless body limit (Vercel: ~4.5 MB), not the
+        // 45 MB GitHub queue cap.
+        const message =
+          res.status === 413
+            ? "This deployment caps request bodies at about 4.5 MB (Vercel). The local heuristic verdict above still applies — run the app locally or use the ClamAV workflow's file_url input for larger files."
+            : data?.error ?? `Could not queue the file (${res.status}).`;
+        setAv({ status: "error", error: message });
         return;
       }
       if (data.status === "done" && data.result) {
@@ -95,6 +99,7 @@ export default function FileScannerSection({ id = "file" }: { id?: string }) {
         sha256: data.sha256,
         runUrl: data.runUrl,
       });
+      toast("Queued for ClamAV — usually 1–3 minutes", "info");
       poll(data.sha256);
     } catch {
       setAv({ status: "error", error: "Could not reach the ClamAV queue." });
@@ -184,6 +189,7 @@ export default function FileScannerSection({ id = "file" }: { id?: string }) {
           e.target.value = "";
         }}
       />
+      {loading && <div className="loading-bar" aria-hidden="true" />}
       <div className="sample-row">
         <span style={{ color: "var(--muted)" }}>Verify the engine:</span>
         <button type="button" onClick={downloadEicar}>
@@ -194,6 +200,12 @@ export default function FileScannerSection({ id = "file" }: { id?: string }) {
         The EICAR file is an industry-standard harmless test string every AV
         flags — download it, then drop it above. Local heuristics and ClamAV
         should both score it MALICIOUS.
+      </div>
+      <div className="note" style={{ marginBottom: 0 }}>
+        Hosted on Vercel? Serverless request bodies are capped at ~4.5 MB, so
+        larger uploads can&apos;t reach ClamAV from the hosted site — local
+        heuristics still run, and the Pro/self-hosted setup has the full 45 MB
+        queue.
       </div>
       {error && <div className="err">{error}</div>}
       {result && <FileResultCard result={result} />}

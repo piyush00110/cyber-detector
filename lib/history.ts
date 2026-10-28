@@ -63,6 +63,17 @@ export function saveToHistory(entry: HistoryEntry) {
   }
 }
 
+export function removeFromHistory(entry: HistoryEntry) {
+  if (typeof window === "undefined") return;
+  try {
+    const k = dedupeKey(entry);
+    const next = loadHistory().filter((h) => dedupeKey(h) !== k);
+    localStorage.setItem(KEY, JSON.stringify(next));
+  } catch {
+    /* ignore */
+  }
+}
+
 export function clearHistory() {
   if (typeof window === "undefined") return;
   localStorage.removeItem(KEY);

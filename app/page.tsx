@@ -11,7 +11,7 @@ const FEATURES = [
   { icon: "🧠", title: "Best-weight URL algorithm", body: "Weighted-signal engine: no-HTTPS, IP hosts, @ tricks, punycode lookalikes, risky TLDs, shorteners, lure keywords, deep paths — one 0–100 risk score." },
   { icon: "🦠", title: "ClamAV virus/file check", body: "Fast local heuristics (SHA-256, magic bytes, entropy, EICAR) plus a real ClamAV scan on GitHub Actions. Files are uploaded to a private queue and never executed." },
   { icon: "🧬", title: "Malicious-code analyzer", body: "Static scan of JS, HTML, Python, PowerShell, shell and macros: eval, obfuscation, stealers, reverse shells, miners — 18 patterns, never executed." },
-  { icon: "💾", title: "localStorage history", body: "Every scan is saved on your device only — URLs store verdict+score, files store hash, code stores filename. Clear anytime, nothing leaves your browser." },
+  { icon: "💾", title: "Searchable local history", body: "Every scan is saved on your device only — URLs store verdict+score, files store hash, code stores filename. Search, filter, export JSON/CSV and clear it from the History page." },
   { icon: "🔌", title: "Free JSON API", body: "POST /api/scan-url, /api/scan-bulk and /api/analyze-code. Documented under API Docs." },
 ];
 
@@ -32,7 +32,7 @@ const FILE_THREATS = [
 const FAQS = [
   { q: "Is it free? Do I need an API key?", a: "Yes, free with no signup. URL scans work in heuristic-only mode without a key; add GOOGLE_SAFE_BROWSING_API_KEY in .env.local for full blocklist verdicts (free quota from Google Cloud). Code scans run locally. File scans add a real ClamAV pass through a private GitHub Actions queue." },
   { q: "Are my files uploaded anywhere?", a: "Yes, for virus scanning. Your browser first runs fast local heuristics (SHA-256, magic bytes, entropy, EICAR). Files up to 45 MB are then uploaded to a private scan queue and checked by the ClamAV engine on GitHub Actions; the payload is deleted after scanning. Files are never executed." },
-  { q: "What is stored in localStorage?", a: "URL scans keep url+verdict+score, file scans keep filename+hash+verdict, code scans keep filename+verdict. Max 30 entries, on your device only. One click clears everything." },
+  { q: "What is stored in localStorage?", a: "URL scans keep url+verdict+score, file scans keep filename+hash+verdict, code scans keep filename+verdict. Max 30 entries, on your device only. The History page can search, filter, export (JSON/CSV), remove single entries or clear everything." },
   { q: "What do the verdicts mean?", a: "CLEAN/SAFE: nothing found. SUSPICIOUS: odd traits — verify before opening. MALICIOUS: dangerous — do not visit, open or run." },
   { q: "Can a clean result still be dangerous?", a: "Yes. Blocklists lag zero-day sites and static analysis can't catch everything. Treat unexpected links and attachments as hostile regardless of verdict — and never run suspicious files on a real machine." },
   { q: "How do I prove the scanner works?", a: "URL tab: use the Google test URLs. File tab: download the EICAR standard test file (harmless) and scan it — it must flag MALICIOUS. Code tab: try the XSS / Obfuscated samples." },
@@ -58,6 +58,7 @@ export default function HomePage() {
             <span>⚡ ~1s scans</span>
             <span>🛡️ ClamAV virus scan</span>
             <span>💾 localStorage history</span>
+            <span>🌗 Light / dark</span>
           </div>
         </div>
       </section>
@@ -168,6 +169,7 @@ export default function HomePage() {
             <p>Five seconds here can save your accounts and your machine.</p>
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
               <a href="#scanner" className="btn" style={{ textDecoration: "none" }}>Scan now</a>
+              <Link href="/history" className="btn btn-ghost" style={{ textDecoration: "none" }}>View history</Link>
               <Link href="/analyze" className="btn btn-ghost" style={{ textDecoration: "none" }}>Open file lab</Link>
             </div>
           </div>

@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CodeResultCard, { type CodeReport } from "@/components/CodeResultCard";
 import { SAMPLE_CODES } from "@/lib/samples";
 import { loadHistory, saveToHistory } from "@/lib/history";
 import { postJson } from "@/lib/scanClient";
+import { toast } from "@/lib/toast";
 
 const MAX_CHARS = 200_000;
 
@@ -15,6 +16,7 @@ export default function CodeAnalyzerSection({ id = "code" }: { id?: string }) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [codeScans, setCodeScans] = useState(0);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setCodeScans(loadHistory().filter((h) => h.kind === "code").length);
@@ -29,7 +31,7 @@ export default function CodeAnalyzerSection({ id = "code" }: { id?: string }) {
     setError(null);
     setResult(null);
     const out = await postJson<CodeReport>("/api/analyze-code", {
-      code: value,
+      code: value.slice(0, MAX_CHARS),
       filename: name,
     });
     if (!out.ok) {
@@ -50,6 +52,20 @@ export default function CodeAnalyzerSection({ id = "code" }: { id?: string }) {
     setLoading(false);
   }
 
+  async function loadFile(file: File | undefined | null) {
+    if (!file) return;
+    if (file.size > MAX_CHARS * 4) {
+      setError("That file is too large — limit is about 200 KB of text.");
+      return;
+    }
+    const text = await file.text();
+    setCode(text.slice(0, MAX_CHARS));
+    setFilename(file.name || "pasted-code.txt");
+    setResult(null);
+    setError(null);
+    toast(`Loaded ${file.name}`, "info");
+  }
+
   return (
     <div className="scanner" id={id}>
       <textarea
@@ -59,13 +75,34 @@ export default function CodeAnalyzerSection({ id = "code" }: { id?: string }) {
         onChange={(e) => setCode(e.target.value.slice(0, MAX_CHARS))}
         placeholder={"Paste suspicious code — JS, HTML, Python, PowerShell, shell…"}
         spellCheck={false}
+        aria-label="Code to analyze"
       />
-      <div className="meta">
-        {filename} · {code.length.toLocaleString()} / {MAX_CHARS.toLocaleString()} chars
+      <div className="meta" style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <input
+          value={filename}
+          onChange={(e) => setFilename(e.target.value)}
+          aria-label="Filename"
+          style={{
+            background: "var(--input-bg)",
+            border: "1px solid var(--border)",
+            borderRadius: 7,
+            color: "var(--text)",
+            padding: "3px 8px",
+            fontSize: 12.5,
+            maxWidth: 220,
+          }}
+        />
+        <span>
+          {code.length.toLocaleString()} / {MAX_CHARS.toLocaleString()} chars
+        </span>
       </div>
       <div className="btn-row">
         <button className="btn" disabled={loading || !code.trim()} onClick={() => analyze(code, filename)}>
+          {loading && <span className="spinner" aria-hidden="true" />}
           {loading ? "Analyzing…" : "Analyze code"}
+        </button>
+        <button className="btn btn-ghost" onClick={() => fileRef.current?.click()}>
+          📁 Load file
         </button>
         <button
           className="btn btn-ghost"
@@ -79,12 +116,24 @@ export default function CodeAnalyzerSection({ id = "code" }: { id?: string }) {
           Clear
         </button>
       </div>
+      <input
+        ref={fileRef}
+        type="file"
+        hidden
+        accept=".js,.jsx,.ts,.tsx,.html,.htm,.py,.ps1,.sh,.bat,.php,.rb,.txt,.vbs,.css,.json"
+        onChange={(e) => {
+          loadFile(e.target.files?.[0]);
+          e.target.value = "";
+        }}
+      />
+      {loading && <div className="loading-bar" aria-hidden="true" />}
       <div className="sample-row">
         <span style={{ color: "var(--muted)" }}>Try:</span>
         {SAMPLE_CODES.map((s) => (
           <button
             key={s.label}
             type="button"
+            disabled={loading}
             onClick={() => {
               setCode(s.code);
               setFilename(s.filename);

@@ -9,7 +9,7 @@ export default function ApiDocsPage() {
         <span className="kicker">Developers</span>
         <h1>API Docs</h1>
         <p>
-          Four JSON endpoints. No auth. File scanning runs fast local heuristics
+          Five JSON endpoints. No auth. File scanning runs fast local heuristics
           in the browser, then queues the file for a real ClamAV scan on GitHub
           Actions. Files are never executed.
         </p>

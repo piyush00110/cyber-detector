@@ -1,6 +1,7 @@
 /**
- * File / virus static-analysis engine — runs 100% in the browser.
- * Nothing is uploaded: the file is hashed (SHA-256) and inspected locally.
+ * File / virus static-analysis heuristics — run in the browser, before upload.
+ * This module reads the file locally (SHA-256 + byte inspection); the file is
+ * then optionally queued for a real ClamAV scan via /api/scan-file.
  *
  * Algorithm (weighted signals, 0-100):
  *  1. EICAR test-file + known-malicious content signatures

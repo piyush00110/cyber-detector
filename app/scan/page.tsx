@@ -3,7 +3,9 @@
 import { useState } from "react";
 import ScannerSection from "@/components/ScannerSection";
 import ResultCard, { type ScanApiResult } from "@/components/ResultCard";
+import { downloadFile } from "@/lib/files";
 import { postJson } from "@/lib/scanClient";
+import { toast } from "@/lib/toast";
 
 type BulkRow = ScanApiResult | { url: string; error: string };
 
@@ -66,12 +68,25 @@ export default function ScanPage() {
           />
           <div className="btn-row">
             <button className="btn" onClick={runBulk} disabled={loading}>
+              {loading && <span className="spinner" aria-hidden="true" />}
               {loading ? "Scanning…" : "Scan URLs"}
             </button>
             <button className="btn btn-ghost" onClick={() => { setBulk(""); setResults([]); setError(null); }}>
               Clear
             </button>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              disabled={results.length === 0}
+              onClick={() => {
+                downloadFile("bulk-scan-results.json", JSON.stringify(results, null, 2));
+                toast("Bulk results downloaded");
+              }}
+            >
+              ⬇ Export results
+            </button>
           </div>
+          {loading && <div className="loading-bar" aria-hidden="true" />}
           {error && <div className="err">{error}</div>}
           {results.length > 0 && (
             <div className="meta" style={{ marginTop: 12 }}>

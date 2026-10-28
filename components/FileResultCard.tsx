@@ -1,3 +1,4 @@
+import ResultActions from "@/components/ResultActions";
 import { formatBytes, type FileReport } from "@/lib/fileAnalysis";
 
 const META = {
@@ -9,10 +10,18 @@ const META = {
 export default function FileResultCard({ result }: { result: FileReport }) {
   const m = META[result.verdict];
   const color =
-    result.verdict === "clean" ? "#22c55e" : result.verdict === "suspicious" ? "#f59e0b" : "#ef4444";
+    result.verdict === "clean" ? "var(--green)" : result.verdict === "suspicious" ? "var(--amber)" : "var(--red)";
   return (
     <div className={`result ${result.verdict}`}>
-      <div className={`badge ${result.verdict}`}>{m.label}</div>
+      <div className="result-head">
+        <div className={`badge ${result.verdict}`}>{m.label}</div>
+        <ResultActions
+          verdictLabel={m.label.replace(/^\S+\s/, "")}
+          target={result.filename}
+          data={result}
+          filename={`file-scan-${result.filename}`}
+        />
+      </div>
       <div className="result-url">{result.filename}</div>
       <div style={{ fontSize: 13.5, color: "var(--muted)", marginTop: 4 }}>{m.blurb}</div>
       <div className="meter">

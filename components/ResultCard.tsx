@@ -1,4 +1,6 @@
 import type { HeuristicReport } from "@/lib/heuristics";
+import ResultActions from "@/components/ResultActions";
+import UrlBreakdown from "@/components/UrlBreakdown";
 
 export type UrlVerdict = "safe" | "suspicious" | "malicious";
 
@@ -23,17 +25,34 @@ const META: Record<UrlVerdict, { label: string; blurb: string }> = {
   malicious: { label: "⛔ MALICIOUS", blurb: "Do not visit. Flagged as dangerous or very high-risk." },
 };
 
+const SOURCE_LABEL: Record<string, string> = {
+  "heuristic-only": "heuristics only",
+  "safe-browsing+heuristics": "Safe Browsing + heuristics",
+};
+
 export default function ResultCard({ result }: { result: ScanApiResult }) {
   const verdict: UrlVerdict = result.verdict ?? (result.safe === false ? "malicious" : "safe");
   const m = META[verdict];
   const score = result.heuristics?.score ?? 0;
-  const color = verdict === "safe" ? "#22c55e" : verdict === "suspicious" ? "#f59e0b" : "#ef4444";
+  const color = verdict === "safe" ? "var(--green)" : verdict === "suspicious" ? "var(--amber)" : "var(--red)";
+  const signals = result.heuristics?.signals ?? [];
 
   return (
     <div className={`result ${verdict}`}>
-      <div className={`badge ${verdict}`}>{m.label}</div>
+      <div className="result-head">
+        <div className={`badge ${verdict}`}>{m.label}</div>
+        <ResultActions
+          verdictLabel={m.label.replace(/^\S+\s/, "")}
+          target={result.url}
+          data={result}
+          filename={`url-scan-${result.url}`}
+        />
+      </div>
       <div className="result-url">{result.url}</div>
       <div style={{ fontSize: 13.5, color: "var(--muted)", marginTop: 4 }}>{m.blurb}</div>
+
+      <UrlBreakdown url={result.url} />
+
       {result.heuristics && (
         <>
           <div className="meter">
@@ -41,11 +60,11 @@ export default function ResultCard({ result }: { result: ScanApiResult }) {
           </div>
           <div className="meta">
             Heuristic risk: <b style={{ color }}>{score}/100</b>
-            {result.source && <> · via {result.source}</>}
+            {result.source && <> · via {SOURCE_LABEL[result.source] ?? result.source}</>}
           </div>
-          {result.heuristics.signals.length > 0 ? (
+          {signals.length > 0 ? (
             <ul className="signals">
-              {result.heuristics.signals.map((s) => (
+              {signals.map((s) => (
                 <li key={s.id}>
                   <b>{s.label}</b> — {s.detail}
                   <span className={`tag ${s.severity}`}>{s.severity}</span>
@@ -57,6 +76,7 @@ export default function ResultCard({ result }: { result: ScanApiResult }) {
           )}
         </>
       )}
+
       {result.matches.length > 0 && (
         <>
           <div className="meta">Google Safe Browsing matches:</div>
@@ -69,7 +89,13 @@ export default function ResultCard({ result }: { result: ScanApiResult }) {
           </ul>
         </>
       )}
-      {result.warning && <div className="meta">⚠️ {result.warning}</div>}
+
+      {result.warning && (
+        <div className="note" style={{ margin: "12px 0 0" }}>
+          ⚠️ {result.warning}
+        </div>
+      )}
+
       {result.scannedAt && (
         <div className="meta">Scanned {new Date(result.scannedAt).toLocaleString()}</div>
       )}
