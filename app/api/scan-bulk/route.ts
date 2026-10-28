@@ -55,7 +55,18 @@ export async function POST(req: NextRequest) {
             scannedAt: new Date().toISOString(),
           };
         } catch {
-          return { url, error: "Scan failed.", heuristics };
+          // Degrade instead of failing the whole item.
+          const verdict = verdictFromResults({
+            safeBrowsingUnsafe: false,
+            heuristicLevel: heuristics.level,
+          });
+          return {
+            url, verdict, safe: verdict === "safe", matches: [], heuristics,
+            source: "heuristic-only",
+            warning:
+              "Safe Browsing lookup failed (key/quota) — heuristic-only result.",
+            scannedAt: new Date().toISOString(),
+          };
         }
       })
     );

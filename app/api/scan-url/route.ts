@@ -43,20 +43,41 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const sb = await checkUrlWithSafeBrowsing(url, apiKey);
-    const verdict = verdictFromResults({
-      safeBrowsingUnsafe: !sb.safe,
-      heuristicLevel: heuristics.level,
-    });
-    return NextResponse.json({
-      url,
-      verdict,
-      safe: verdict === "safe",
-      matches: sb.matches,
-      heuristics,
-      source: "safe-browsing+heuristics",
-      scannedAt: new Date().toISOString(),
-    });
+    try {
+      const sb = await checkUrlWithSafeBrowsing(url, apiKey);
+      const verdict = verdictFromResults({
+        safeBrowsingUnsafe: !sb.safe,
+        heuristicLevel: heuristics.level,
+      });
+      return NextResponse.json({
+        url,
+        verdict,
+        safe: verdict === "safe",
+        matches: sb.matches,
+        heuristics,
+        source: "safe-browsing+heuristics",
+        scannedAt: new Date().toISOString(),
+      });
+    } catch (sbErr) {
+      // A bad/blocked key or quota error must not break the scan. Degrade to
+      // heuristics so the user still gets a useful verdict plus a warning.
+      console.error("Safe Browsing lookup failed, using heuristics:", sbErr);
+      const verdict = verdictFromResults({
+        safeBrowsingUnsafe: false,
+        heuristicLevel: heuristics.level,
+      });
+      return NextResponse.json({
+        url,
+        verdict,
+        safe: verdict === "safe",
+        matches: [],
+        heuristics,
+        source: "heuristic-only",
+        warning:
+          "Safe Browsing lookup failed (key blocked/invalid or quota reached) — showing heuristic-only result. Fix GOOGLE_SAFE_BROWSING_API_KEY for full blocklist verdicts.",
+        scannedAt: new Date().toISOString(),
+      });
+    }
   } catch (err) {
     console.error("scan-url error:", err);
     return NextResponse.json(
