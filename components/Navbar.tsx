@@ -8,7 +8,9 @@ import ThemeToggle from "@/components/ThemeToggle";
 const links = [
   { href: "/scan", label: "URL Scanner" },
   { href: "/analyze", label: "Code & Files" },
+  { href: "/extension", label: "Extension" },
   { href: "/history", label: "History" },
+  { href: "/results", label: "Results" },
   { href: "/learn", label: "Learn" },
   { href: "/api-docs", label: "API Docs" },
   { href: "/about", label: "About" },

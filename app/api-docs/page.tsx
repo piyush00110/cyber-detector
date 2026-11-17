@@ -9,9 +9,10 @@ export default function ApiDocsPage() {
         <span className="kicker">Developers</span>
         <h1>API Docs</h1>
         <p>
-          Five JSON endpoints. No auth. File scanning runs fast local heuristics
-          in the browser, then queues the file for a real ClamAV scan on GitHub
-          Actions. Files are never executed.
+          JSON endpoints, no auth. File scanning runs fast local heuristics in
+          the browser, then queues the file for a real ClamAV scan on GitHub
+          Actions. Files are never executed. The same API powers the{" "}
+          <a href="/extension">browser extension</a>.
         </p>
         <h2>POST /api/scan-url</h2>
         <p>Scan a single URL. Returns verdict, Safe Browsing matches, heuristics and timestamp.</p>
@@ -81,6 +82,48 @@ export default function ApiDocsPage() {
     "scannedAt": "…"
   }
 }`}</pre>
+        <h2>GET /api/scan-results?limit=25</h2>
+        <p>
+          Reads the workflow-generated data listing
+          (<code>scan-results/index.json</code>) from the private quarantine repo:
+          every published ClamAV verdict, filename, SHA-256, signatures and
+          timestamp. The workflow rebuilds the listing after each scan. Limit:
+          1–100 (default 25).
+        </p>
+        <pre className="code">{`curl "http://localhost:3000/api/scan-results?limit=10"
+
+# response
+{
+  "status": "ok",
+  "source": "github",
+  "generatedAt": "2026-10-28T00:00:00Z",
+  "total": 12,
+  "clean": 11,
+  "malicious": 1,
+  "results": [
+    {
+      "sha256": "…",
+      "filename": "invoice.pdf",
+      "infected": false,
+      "verdict": "clean",
+      "signatures": [],
+      "scannedAt": "2026-10-28T00:00:00Z",
+      "engine": "ClamAV",
+      "resultPath": "scan-results/….json"
+    }
+  ],
+  "truncated": false
+}`}</pre>
+        <p>
+          Returns <code>503</code> until <code>GITHUB_PAT</code> and{" "}
+          <code>GITHUB_QUARANTINE_REPOSITORY</code> are configured, unless a
+          local snapshot exists. Run <code>npm run results:pull</code> to cache
+          the workflow listing in <code>.cache/scan-results/index.json</code>;
+          the response then has <code>&quot;source&quot;: &quot;snapshot&quot;</code>.
+          The listing includes filenames and hashes from every scan, so run the
+          app locally or protect a public deployment.
+        </p>
+
         <h2>File scanning (local heuristics)</h2>
         <p>
           Use <code>lib/fileAnalysis.ts</code> → <code>analyzeFile(file)</code> in
@@ -88,6 +131,39 @@ export default function ApiDocsPage() {
           magic-byte verification + entropy + embedded-script scan. The ClamAV
           queue is wired in <code>components/FileScannerSection.tsx</code>.
         </p>
+        <h2>Share links (no API key)</h2>
+        <p>
+          A scan can be shared as a URL. The link contains only the scanned URL
+          — never the verdict or score — and opening it re-runs the scan:
+        </p>
+        <pre className="code">{`https://your-host/scan?url=https%3A%2F%2Fexample.com%2Flogin
+
+# Equivalent JS
+const share = \`\${location.origin}/scan?url=\${encodeURIComponent(url)}\`;
+await navigator.clipboard.writeText(share);`}</pre>
+        <p>
+          The extension&apos;s <b>Copy link</b> button creates the same link. The
+          scanner automatically unwraps a pasted <code>/scan?url=…</code> link,
+          so you can drop one into the URL box on the scan page.
+        </p>
+
+        <h2>Browser extension API usage</h2>
+        <p>
+          The extension calls <code>POST /api/scan-url</code> from its popup and
+          background service worker, then keeps the last 25 results in{" "}
+          <code>chrome.storage.local</code>. Configure the base URL in the
+          extension Options (default <code>http://localhost:3000</code>). The
+          right-click scan actions use the same request and show the verdict in
+          a notification.
+        </p>
+        <pre className="code">{`// extension/lib/api.js (excerpt)
+const res = await fetch(\`\${baseUrl}/api/scan-url\`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ url })
+});
+const result = await res.json();`}</pre>
+
         <h2>localStorage schema</h2>
         <pre className="code">{`key: "cyber-detector-history-v1"   // max 30 entries, newest first
 { kind: "url",  url, verdict, score, scannedAt }

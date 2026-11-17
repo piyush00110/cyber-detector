@@ -46,6 +46,7 @@ export default function ResultCard({ result }: { result: ScanApiResult }) {
           target={result.url}
           data={result}
           filename={`url-scan-${result.url}`}
+          shareTarget={result.url}
         />
       </div>
       <div className="result-url">{result.url}</div>

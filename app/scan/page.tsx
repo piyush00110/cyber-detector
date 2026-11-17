@@ -55,6 +55,12 @@ export default function ScanPage() {
           algorithm and are saved to localStorage. Bulk mode scans up to 10
           URLs at once.
         </p>
+        <p className="meta" style={{ maxWidth: 680 }}>
+          Every result has a <b>Copy link</b> button. A shared link looks like{" "}
+          <code>/scan?url=…</code>, contains only the URL (never a stored
+          verdict), and re-runs the scan automatically when opened. Paste a
+          share link into the box below and it will be unwrapped for you.
+        </p>
         <h2 style={{ fontSize: 20, marginTop: 32 }}>Single URL</h2>
         <ScannerSection id="single" />
         <h2 style={{ fontSize: 20, marginTop: 40 }}>Bulk scan (up to 10)</h2>

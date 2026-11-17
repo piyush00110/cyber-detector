@@ -231,6 +231,32 @@ textarea.code-input:focus { outline: none; border-color: var(--blue); box-shadow
 }
 .dropzone:hover, .dropzone.over { border-color: var(--blue); background: var(--glow); color: var(--text); }
 
+/* shared-link notice */
+.share-banner {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin: 0 0 14px; padding: 10px 14px; border-radius: 10px;
+  border: 1px solid var(--ring); background: var(--glow);
+  color: var(--muted-2); font-size: 13px;
+}
+.share-banner code { word-break: break-all; color: var(--text); }
+.share-banner .link-btn { margin-left: auto; }
+
+/* extension page */
+.ext-steps { list-style: none; padding: 0; margin: 18px 0 24px; display: grid; gap: 12px; }
+.ext-steps li {
+  display: flex; gap: 14px; align-items: flex-start;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px;
+}
+.ext-steps .num {
+  width: 30px; height: 30px; flex-shrink: 0; border-radius: 9px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--glow); border: 1px solid var(--ring);
+  color: var(--blue); font-weight: 900; font-size: 13px;
+}
+.ext-steps b { display: block; margin-bottom: 2px; }
+.ext-steps p { margin: 0; color: var(--muted); font-size: 14px; }
+
 /* loading bar */
 .loading-bar {
   height: 3px; border-radius: 999px; margin-top: 14px; overflow: hidden;

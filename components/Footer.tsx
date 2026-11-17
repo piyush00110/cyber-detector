@@ -17,7 +17,9 @@ export default function Footer() {
         <nav>
           <Link href="/scan">URL Scanner</Link>
           <Link href="/analyze">Code & Files</Link>
+          <Link href="/extension">Extension</Link>
           <Link href="/history">History</Link>
+          <Link href="/results">ClamAV results</Link>
           <Link href="/learn">Learn</Link>
           <Link href="/api-docs">API Docs</Link>
           <Link href="/about">About</Link>

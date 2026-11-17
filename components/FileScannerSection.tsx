@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import FileResultCard from "@/components/FileResultCard";
 import {
@@ -210,6 +211,9 @@ export default function FileScannerSection({ id = "file" }: { id?: string }) {
       {error && <div className="err">{error}</div>}
       {result && <FileResultCard result={result} />}
       {av && <AvPanel av={av} />}
+      <div className="meta" style={{ textAlign: "center", marginTop: 16 }}>
+        <Link href="/results">View all ClamAV results →</Link>
+      </div>
     </div>
   );
 }

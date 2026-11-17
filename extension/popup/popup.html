@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cyber Detector</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="top">
+        <div class="brand">
+          <img src="../icons/icon48.png" alt="" width="28" height="28" />
+          <div>
+            <strong>Cyber Detector</strong>
+            <span>link safety scanner</span>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button id="open-app" type="button" class="icon-btn" title="Open the full scanner" aria-label="Open the full scanner">↗</button>
+          <button id="open-options" type="button" class="icon-btn" title="Extension settings" aria-label="Extension settings">⚙️</button>
+        </div>
+      </header>
+
+      <main>
+        <form id="scan-form" class="scan-card" autocomplete="off">
+          <label for="url">Link to scan</label>
+          <div class="input-row">
+            <input
+              id="url"
+              name="url"
+              type="text"
+              inputmode="url"
+              spellcheck="false"
+              placeholder="https://example.com/login"
+              aria-describedby="scan-status"
+            />
+            <button id="scan" type="submit" class="primary">Scan</button>
+          </div>
+          <div class="quick-row">
+            <button id="scan-current" type="button" class="ghost">🖥️ This tab</button>
+            <button id="paste" type="button" class="ghost">📋 Paste</button>
+            <button id="paste-scan" type="button" class="ghost">⚡ Paste &amp; scan</button>
+          </div>
+          <div id="scan-status" class="status" role="status" aria-live="polite"></div>
+        </form>
+
+        <section id="result" class="result" hidden aria-live="polite"></section>
+
+        <section id="recent-wrap" class="recent" hidden>
+          <div class="recent-head">
+            <h2>Recent scans</h2>
+            <button id="clear-recent" type="button" class="link-btn">Clear</button>
+          </div>
+          <div id="recent-list" class="recent-list"></div>
+        </section>
+      </main>
+
+      <footer class="foot">
+        <span id="server-label">localhost:3000</span>
+        <span>·</span>
+        <button id="open-options-2" type="button" class="link-btn">Settings</button>
+      </footer>
+    </div>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

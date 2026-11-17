@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import ResultCard, { type ScanApiResult } from "@/components/ResultCard";
-import { downloadFile } from "@/lib/files";
+import { copyText, downloadFile } from "@/lib/files";
 import { kindLabel, timeAgo, verdictColor, verdictLabel } from "@/lib/format";
+import { buildScanShareUrl } from "@/lib/share";
 import {
   clearHistory,
   loadHistory,
@@ -231,15 +232,29 @@ export default function HistoryPage() {
                     </td>
                     <td style={{ whiteSpace: "nowrap", textAlign: "right" }}>
                       {h.kind === "url" && (
-                        <button
-                          type="button"
-                          className="chip-btn"
-                          disabled={busy === h.url}
-                          onClick={() => rescanUrl(h.url)}
-                          style={{ marginRight: 6 }}
-                        >
-                          {busy === h.url ? "Scanning…" : "Rescan"}
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            className="chip-btn"
+                            onClick={async () => {
+                              const ok = await copyText(buildScanShareUrl(h.url));
+                              toast(ok ? "Share link copied" : "Copy failed", ok ? "ok" : "err");
+                            }}
+                            style={{ marginRight: 6 }}
+                            title="Copy a link that re-runs this scan"
+                          >
+                            🔗 Link
+                          </button>
+                          <button
+                            type="button"
+                            className="chip-btn"
+                            disabled={busy === h.url}
+                            onClick={() => rescanUrl(h.url)}
+                            style={{ marginRight: 6 }}
+                          >
+                            {busy === h.url ? "Scanning…" : "Rescan"}
+                          </button>
+                        </>
                       )}
                       <button
                         type="button"

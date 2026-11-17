@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "scan:ci": "node --env-file-if-exists=.env.local scripts/trigger-clamav-scan.mjs",
-    "setup:quarantine": "node --env-file-if-exists=.env.local scripts/setup-quarantine-repo.mjs"
+    "results:pull": "node --env-file-if-exists=.env.local scripts/pull-scan-results.mjs",
+    "setup:quarantine": "node --env-file-if-exists=.env.local scripts/setup-quarantine-repo.mjs",
+    "extension:zip": "node scripts/package-extension.mjs"
   },
   "dependencies": {
     "next": "14.2.5",

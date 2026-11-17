@@ -145,7 +145,9 @@ against virus signatures.
 
 1. \`POST /api/scan-file\` commits the upload to \`quarantine/incoming/<sha256>-<name>\`.
 2. The commit triggers \`.github/workflows/clamav-scan.yml\`.
-3. The workflow scans, writes \`scan-results/<sha256>.json\`, and deletes the payload.
+3. The workflow scans, writes \`scan-results/<sha256>.json\`, deletes the payload,
+   and regenerates the \`scan-results/index.json\` + \`scan-results/README.md\`
+   data listing (served by \`GET /api/scan-results\`).
 
 Do not make this repo public.
 `;

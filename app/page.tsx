@@ -9,10 +9,11 @@ export const metadata: Metadata = {
 const FEATURES = [
   { icon: "🔍", title: "Google Safe Browsing", body: "URLs checked against Google's blocklists: malware, phishing (social engineering), unwanted software and harmful apps." },
   { icon: "🧠", title: "Best-weight URL algorithm", body: "Weighted-signal engine: no-HTTPS, IP hosts, @ tricks, punycode lookalikes, risky TLDs, shorteners, lure keywords, deep paths — one 0–100 risk score." },
-  { icon: "🦠", title: "ClamAV virus/file check", body: "Fast local heuristics (SHA-256, magic bytes, entropy, EICAR) plus a real ClamAV scan on GitHub Actions. Files are uploaded to a private queue and never executed." },
+  { icon: "🦠", title: "ClamAV virus/file check", body: "Fast local heuristics (SHA-256, magic bytes, entropy, EICAR) plus a real ClamAV scan on GitHub Actions. Files are uploaded to a private queue and never executed — and every result lands in a workflow-generated data listing." },
   { icon: "🧬", title: "Malicious-code analyzer", body: "Static scan of JS, HTML, Python, PowerShell, shell and macros: eval, obfuscation, stealers, reverse shells, miners — 18 patterns, never executed." },
   { icon: "💾", title: "Searchable local history", body: "Every scan is saved on your device only — URLs store verdict+score, files store hash, code stores filename. Search, filter, export JSON/CSV and clear it from the History page." },
   { icon: "🔌", title: "Free JSON API", body: "POST /api/scan-url, /api/scan-bulk and /api/analyze-code. Documented under API Docs." },
+  { icon: "🧩", title: "Browser extension", body: "Scan the tab you are on, right-click any link, or paste a link — then copy the full report or a shareable re-scan link. Works in Chrome, Edge, Brave and Opera." },
 ];
 
 const URL_THREATS = [
@@ -36,6 +37,8 @@ const FAQS = [
   { q: "What do the verdicts mean?", a: "CLEAN/SAFE: nothing found. SUSPICIOUS: odd traits — verify before opening. MALICIOUS: dangerous — do not visit, open or run." },
   { q: "Can a clean result still be dangerous?", a: "Yes. Blocklists lag zero-day sites and static analysis can't catch everything. Treat unexpected links and attachments as hostile regardless of verdict — and never run suspicious files on a real machine." },
   { q: "How do I prove the scanner works?", a: "URL tab: use the Google test URLs. File tab: download the EICAR standard test file (harmless) and scan it — it must flag MALICIOUS. Code tab: try the XSS / Obfuscated samples." },
+  { q: "Is there a browser extension?", a: "Yes. The Chrome/Edge/Brave extension scans the current tab, handles right-click link scans, pastes links from your clipboard, and copies a full report or a shareable /scan?url=… link. See the Extension page for load-unpacked steps and permissions." },
+  { q: "What exactly is in a share link?", a: "Only the URL you scanned, encoded in the query string (/scan?url=…). No verdict, score or personal data is stored on the server; opening the link re-runs the scan against live blocklists and heuristics." },
 ];
 
 export default function HomePage() {
@@ -58,6 +61,7 @@ export default function HomePage() {
             <span>⚡ ~1s scans</span>
             <span>🛡️ ClamAV virus scan</span>
             <span>💾 localStorage history</span>
+            <span>🧩 Browser extension</span>
             <span>🌗 Light / dark</span>
           </div>
         </div>
@@ -114,6 +118,33 @@ export default function HomePage() {
               <div className="num">3</div>
               <h3>Verdict + local history</h3>
               <p>CLEAN/SAFE, SUSPICIOUS or MALICIOUS with per-signal severity tags — saved to localStorage on your device only.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 0 }}>
+        <div className="wrap">
+          <div className="cta">
+            <span className="kicker">Browser extension</span>
+            <h2>Scan links where you find them</h2>
+            <p>
+              Open the popup on any tab, right-click a link, or paste from your
+              clipboard. Copy a full report or a share link when you need to
+              pass it on.
+            </p>
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+              <Link href="/extension" className="btn" style={{ textDecoration: "none" }}>
+                Get the extension
+              </Link>
+              <a
+                href="/cyber-detector-extension.zip"
+                className="btn btn-ghost"
+                download
+                style={{ textDecoration: "none" }}
+              >
+                ⬇ Download ZIP
+              </a>
             </div>
           </div>
         </div>

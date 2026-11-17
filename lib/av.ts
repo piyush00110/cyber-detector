@@ -14,6 +14,21 @@ export interface AvResult {
   engine: string;
 }
 
+/** One row in the workflow-generated `scan-results/index.json` data listing. */
+export interface ScanResultListItem extends AvResult {
+  resultPath?: string;
+}
+
+/** Aggregate listing published by `.github/workflows/clamav-scan.yml`. */
+export interface ScanResultsIndex {
+  generatedAt: string;
+  repository?: string;
+  total: number;
+  clean: number;
+  malicious: number;
+  results: ScanResultListItem[];
+}
+
 export type AvState =
   | { status: "queued" | "pending"; sha256: string; runUrl?: string }
   | { status: "done"; sha256: string; result: AvResult }

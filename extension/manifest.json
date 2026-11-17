@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "Cyber Detector — Link Safety Scanner",
+  "short_name": "Cyber Detector",
+  "version": "1.0.0",
+  "description": "Scan the current tab or any pasted link with Google Safe Browsing + weighted phishing heuristics. Copy a full report or a shareable re-scan link.",
+  "minimum_chrome_version": "102",
+  "action": {
+    "default_title": "Scan this page with Cyber Detector",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "contextMenus",
+    "notifications",
+    "clipboardRead",
+    "clipboardWrite"
+  ],
+  "host_permissions": [
+    "http://localhost/*",
+    "http://127.0.0.1/*",
+    "https://localhost/*",
+    "https://127.0.0.1/*"
+  ],
+  "optional_host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Open Cyber Detector"
+    }
+  }
+}

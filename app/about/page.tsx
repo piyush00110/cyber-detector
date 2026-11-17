@@ -21,7 +21,16 @@ export default function AboutPage() {
           <li><b>URLs</b> (<code>lib/heuristics.ts</code>): 14 severity-weighted signals → 0–100 score → safe/low/suspicious/high, combined with Google Safe Browsing blocklists.</li>
           <li><b>Files</b> (<code>lib/fileAnalysis.ts</code> + <code>lib/githubQuarantine.ts</code>): local SHA-256, EICAR/content signatures, extension risk, magic-byte verification, Shannon entropy and embedded-script scan — then a real ClamAV pass through a private GitHub Actions quarantine queue. Files are never executed.</li>
           <li><b>Code</b> (<code>lib/codeAnalysis.ts</code>): 18 static patterns with line numbers and matched snippets — never executed.</li>
+          <li><b>Extension</b> (<code>extension/</code>): Manifest V3 popup + context menus; calls the same <code>/api/scan-url</code> endpoint, keeps 25 recent scans in <code>chrome.storage.local</code>, and copies full reports or share links.</li>
         </ul>
+        <h2>Sharing scans</h2>
+        <p>
+          Result cards include <b>Copy report</b>, <b>Copy verdict</b>,{" "}
+          <b>Copy JSON</b>, <b>Copy link</b> and <b>Download</b>. A share link
+          looks like <code>/scan?url=…</code> and contains only the scanned URL —
+          no verdict or personal data is stored on the server. Opening it (or
+          pasting it into the scan box) re-runs the scan against live data.
+        </p>
         <h2>Privacy</h2>
         <p>
           URLs are checked against Google Safe Browsing (required for
@@ -42,6 +51,7 @@ export default function AboutPage() {
         <p>
           <Link href="/scan">→ URL scanner</Link> ·{" "}
           <Link href="/analyze">→ File & code lab</Link> ·{" "}
+          <Link href="/extension">→ Browser extension</Link> ·{" "}
           <Link href="/learn">→ Learn the red flags</Link>
         </p>
       </div>

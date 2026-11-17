@@ -4,6 +4,9 @@ node_modules
 dev*.log
 *.tsbuildinfo
 
+# Local snapshot of the workflow-generated ClamAV data listing.
+.cache/
+
 # ClamAV quarantine — do not commit scanned payloads to a public repo.
 quarantine/*
 !quarantine/README.md

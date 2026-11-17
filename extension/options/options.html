@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cyber Detector — Extension settings</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="head">
+        <img src="../icons/icon128.png" alt="" width="48" height="48" />
+        <div>
+          <h1>Cyber Detector settings</h1>
+          <p>Link safety scanner extension <span id="version"></span></p>
+        </div>
+      </header>
+
+      <section class="card">
+        <h2>Scanner server</h2>
+        <p class="hint">
+          The extension sends URLs to <code>POST /api/scan-url</code> on this
+          server. Default is the local dev server.
+        </p>
+        <label for="base-url">Base URL</label>
+        <input id="base-url" type="url" spellcheck="false" placeholder="http://localhost:3000" />
+        <p id="origin-hint" class="small"></p>
+
+        <div class="check-row">
+          <label class="check">
+            <input id="notifications" type="checkbox" />
+            <span>Show a notification after right-click scans</span>
+          </label>
+          <label class="check">
+            <input id="auto-scan" type="checkbox" />
+            <span>Scan the current tab automatically when the popup opens</span>
+          </label>
+        </div>
+
+        <div class="btn-row">
+          <button id="save" type="button" class="btn">Save settings</button>
+          <button id="test" type="button" class="btn ghost">Test connection</button>
+          <button id="reset" type="button" class="btn ghost">Reset defaults</button>
+        </div>
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+      </section>
+
+      <section class="card">
+        <h2>Local history</h2>
+        <p class="hint">
+          Right-click scans and popup scans are stored only in{" "}
+          <code>chrome.storage.local</code> on this device (max 25 entries).
+        </p>
+        <p class="small">Saved scans: <b id="history-count">0</b></p>
+        <div class="btn-row">
+          <button id="export" type="button" class="btn ghost">⬇ Export JSON</button>
+          <button id="clear" type="button" class="btn ghost danger">Clear history</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>What the extension can access</h2>
+        <ul class="permissions">
+          <li><code>tabs</code> / <code>activeTab</code> — read the current tab URL for scanning.</li>
+          <li><code>storage</code> — settings and local history.</li>
+          <li><code>contextMenus</code> — the right-click scan actions.</li>
+          <li><code>notifications</code> — verdict notifications.</li>
+          <li><code>clipboardRead</code> / <code>clipboardWrite</code> — Paste and Copy buttons.</li>
+          <li>Host access is limited to localhost until you add another origin here.</li>
+        </ul>
+        <p class="hint">
+          No analytics, no accounts and no server-side history. Scans are sent
+          only to the server above.
+        </p>
+      </section>
+
+      <footer class="foot">
+        <a id="open-app" href="#">Open the web scanner ↗</a>
+        <span>·</span>
+        <a href="#" id="docs-link" target="_blank" rel="noreferrer">Extension guide ↗</a>
+      </footer>
+    </div>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>
