@@ -66,6 +66,10 @@ export default function ScanPage() {
           Prefer the full-screen experience?{" "}
           <Link href="/scan/live">
             <b>Open the live scan HUD →</b>
+          </Link>{" "}
+          or enter the{" "}
+          <Link href="/command">
+            <b>command center →</b>
           </Link>
         </p>
         <h2 style={{ fontSize: 20, marginTop: 32 }}>Single URL</h2>

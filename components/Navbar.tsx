@@ -7,6 +7,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 
 const links = [
   { href: "/scan", label: "URL Scanner" },
+  { href: "/command", label: "Command Center" },
   { href: "/scan/live", label: "Live Scan" },
   { href: "/analyze", label: "Code & Files" },
   { href: "/extension", label: "Extension" },

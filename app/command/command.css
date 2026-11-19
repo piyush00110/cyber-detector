@@ -1,0 +1,240 @@
+@tailwind components;
+
+/* --------------------------------------------------------------------------
+   CyberDetector command-center theme (from the Stitch design system).
+   Preflight is disabled in tailwind.config.ts: these scoped resets keep the
+   rest of the marketing site untouched.
+-------------------------------------------------------------------------- */
+:where(.command-app) {
+  box-sizing: border-box;
+  background-color: #05070d;
+  color: #e1e2ec;
+  color-scheme: dark;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+:where(.command-app) *,
+:where(.command-app) *::before,
+:where(.command-app) *::after {
+  box-sizing: border-box;
+}
+
+:where(.command-app) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:where(.command-app) a:hover {
+  text-decoration: none;
+}
+
+:where(.command-app) button {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+:where(.command-app) h1,
+:where(.command-app) h2,
+:where(.command-app) h3,
+:where(.command-app) h4,
+:where(.command-app) p,
+:where(.command-app) pre {
+  margin: 0;
+}
+
+:where(.command-app) svg {
+  display: block;
+}
+
+:where(.command-app) ::-webkit-scrollbar {
+  display: none;
+}
+
+.command-app {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.clip-chamfer {
+  clip-path: polygon(
+    10px 0,
+    100% 0,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    0 100%,
+    0 10px
+  );
+}
+
+.glass-card {
+  background: linear-gradient(
+    135deg,
+    rgba(20, 26, 40, 0.72) 0%,
+    rgba(9, 13, 22, 0.88) 100%
+  );
+  border: 1px solid rgba(0, 240, 255, 0.16);
+  box-shadow:
+    0 4px 24px -1px rgba(0, 0, 0, 0.7),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-card-interactive:hover {
+  border-color: rgba(0, 240, 255, 0.4);
+  box-shadow:
+    0 0 18px -2px rgba(0, 240, 255, 0.25),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.15);
+}
+
+.obsidian-card {
+  background: linear-gradient(
+    135deg,
+    rgba(23, 29, 44, 0.72) 0%,
+    rgba(11, 14, 21, 0.88) 100%
+  );
+  border: 1px solid rgba(0, 240, 255, 0.16);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.titanium-edge {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 1px 0 0 rgba(0, 240, 255, 0.12),
+    0 12px 30px rgba(0, 0, 0, 0.85);
+}
+
+.titanium-nav {
+  border-top: 1px solid rgba(0, 240, 255, 0.15);
+  box-shadow:
+    0 -10px 30px rgba(0, 0, 0, 0.9),
+    0 -1px 12px rgba(0, 240, 255, 0.15);
+}
+
+.tactical-grid,
+.tactical-grid-bg {
+  background-size: 20px 20px;
+  background-image:
+    linear-gradient(to right, rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+}
+
+.crimson-radar-scan {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 42, 85, 0.15) 0%,
+    rgba(255, 42, 85, 0) 100%
+  );
+}
+
+.glass-specular {
+  box-shadow:
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.12),
+    0 8px 32px 0 rgba(0, 0, 0, 0.6);
+}
+
+.glass-specular-crimson {
+  box-shadow:
+    inset 0 1px 1px 0 rgba(255, 90, 120, 0.25),
+    0 12px 36px 0 rgba(255, 20, 60, 0.18);
+}
+
+.glass-specular-cyan {
+  box-shadow:
+    inset 0 1px 1px 0 rgba(0, 240, 255, 0.3),
+    0 10px 30px 0 rgba(0, 240, 255, 0.12);
+}
+
+.cyber-glow-cyan {
+  box-shadow: 0 0 25px -4px rgba(0, 240, 255, 0.45);
+}
+
+.cyber-glow-emerald {
+  box-shadow: 0 0 20px -3px rgba(0, 230, 153, 0.45);
+}
+
+.cyber-glow-crimson {
+  box-shadow: 0 0 16px -2px rgba(255, 42, 85, 0.5);
+}
+
+/* Tailwind v3 stores transform/filter/gradient pieces in CSS variables that
+   are normally emitted by preflight. Preflight is disabled for the rest of the
+   site, so restore the defaults inside the command app only. */
+.command-app,
+.command-app *,
+.command-app *::before,
+.command-app *::after {
+  --tw-border-spacing-x: 0;
+  --tw-border-spacing-y: 0;
+  --tw-translate-x: 0;
+  --tw-translate-y: 0;
+  --tw-rotate: 0;
+  --tw-skew-x: 0;
+  --tw-skew-y: 0;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  --tw-pan-x: ;
+  --tw-pan-y: ;
+  --tw-pinch-zoom: ;
+  --tw-scroll-snap-strictness: proximity;
+  --tw-gradient-from-position: ;
+  --tw-gradient-via-position: ;
+  --tw-gradient-to-position: ;
+  --tw-ordinal: ;
+  --tw-slashed-zero: ;
+  --tw-numeric-figure: ;
+  --tw-numeric-spacing: ;
+  --tw-numeric-fraction: ;
+  --tw-ring-inset: ;
+  --tw-ring-offset-width: 0px;
+  --tw-ring-offset-color: #fff;
+  --tw-ring-color: rgb(59 130 246 / 0.5);
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-shadow: 0 0 #0000;
+  --tw-shadow-colored: 0 0 #0000;
+  --tw-blur: ;
+  --tw-brightness: ;
+  --tw-contrast: ;
+  --tw-grayscale: ;
+  --tw-hue-rotate: ;
+  --tw-invert: ;
+  --tw-saturate: ;
+  --tw-sepia: ;
+  --tw-drop-shadow: ;
+  --tw-backdrop-blur: ;
+  --tw-backdrop-brightness: ;
+  --tw-backdrop-contrast: ;
+  --tw-backdrop-grayscale: ;
+  --tw-backdrop-hue-rotate: ;
+  --tw-backdrop-invert: ;
+  --tw-backdrop-opacity: ;
+  --tw-backdrop-saturate: ;
+  --tw-backdrop-sepia: ;
+}
+
+@tailwind utilities;
