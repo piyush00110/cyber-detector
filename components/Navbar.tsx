@@ -7,6 +7,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 
 const links = [
   { href: "/scan", label: "URL Scanner" },
+  { href: "/scan/live", label: "Live Scan" },
   { href: "/analyze", label: "Code & Files" },
   { href: "/extension", label: "Extension" },
   { href: "/history", label: "History" },
@@ -24,8 +25,11 @@ export default function Navbar() {
     setOpen(false);
   }, [pathname]);
 
-  const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname.startsWith(href);
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    if (href === "/scan") return pathname === "/scan";
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
 
   return (
     <header className="nav">

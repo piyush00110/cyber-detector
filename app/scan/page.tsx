@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import ScannerSection from "@/components/ScannerSection";
 import ResultCard, { type ScanApiResult } from "@/components/ResultCard";
 import { downloadFile } from "@/lib/files";
@@ -60,6 +61,12 @@ export default function ScanPage() {
           <code>/scan?url=…</code>, contains only the URL (never a stored
           verdict), and re-runs the scan automatically when opened. Paste a
           share link into the box below and it will be unwrapped for you.
+        </p>
+        <p className="meta" style={{ maxWidth: 680 }}>
+          Prefer the full-screen experience?{" "}
+          <Link href="/scan/live">
+            <b>Open the live scan HUD →</b>
+          </Link>
         </p>
         <h2 style={{ fontSize: 20, marginTop: 32 }}>Single URL</h2>
         <ScannerSection id="single" />

@@ -16,6 +16,7 @@ export default function Footer() {
         </div>
         <nav>
           <Link href="/scan">URL Scanner</Link>
+          <Link href="/scan/live">Live Scan</Link>
           <Link href="/analyze">Code & Files</Link>
           <Link href="/extension">Extension</Link>
           <Link href="/history">History</Link>
